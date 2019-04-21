@@ -1,9 +1,14 @@
 import { parse } from 'url';
 
-export default (req, res) => {
+import BitcoinService from '../../../../services/Bitcoin';
+
+export default async (req, res) => {
   const payload = { error: false };
 
-  payload.error = true;
-  payload.message = 'TODO';
+  const { query } = parse(req.url, true);
+
+  const service = new BitcoinService(query.live);
+
+  payload.results = await service.generate();
   res.end(JSON.stringify(payload, null, 4));
 };
