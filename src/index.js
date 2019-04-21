@@ -1,13 +1,6 @@
-import Bitcoin from './services/Bitcoin';
-import Litecoin from './services/Litecoin';
-import Ethereum from './services/Ethereum';
-import NEM from './services/NEM';
-import Stellar from './services/Stellar';
+const { parse } = require('url')
 
-export {
-  Bitcoin,
-  Litecoin,
-  Ethereum,
-  NEM,
-  Stellar
+module.exports = (req, res) => {
+  const { host, pathname, query } = parse(req.url, true);
+  res.end(host + ' -- ' + pathname);
 }
