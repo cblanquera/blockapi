@@ -1,6 +1,6 @@
 import { parse } from 'url';
 
-export default (req, res) => {
+export default async (req) => {
   const { query } = parse(req.url, true);
   const { secret, destination, amount } = query;
 
@@ -27,11 +27,10 @@ export default (req, res) => {
     payload.error = true;
     payload.message = 'Invalid parameters';
     payload.validation = errors;
-    res.end(JSON.stringify(payload, null, 4));
-    return;
+    return JSON.stringify(payload, null, 4);
   }
 
   payload.error = true;
   payload.message = 'TODO';
-  res.end(JSON.stringify(payload, null, 4));
+  return JSON.stringify(payload, null, 4);
 };

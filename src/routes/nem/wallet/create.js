@@ -1,9 +1,9 @@
 import { parse } from 'url';
 
-export default (req, res) => {
+export default async (req) => {
   const payload = { error: false };
 
   payload.error = true;
   payload.message = 'TODO';
-  res.end(JSON.stringify(payload, null, 4));
+  return JSON.stringify(payload, null, 4);
 };

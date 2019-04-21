@@ -1,6 +1,6 @@
 import { parse } from 'url';
 
-export default (req, res) => {
+export default async (req) => {
   const { query } = parse(req.url, true);
   const { address } = query;
 
@@ -9,11 +9,10 @@ export default (req, res) => {
   if (!address) {
     payload.error = true;
     payload.message = 'No address given';
-    res.end(JSON.stringify(payload, null, 4));
-    return;
+    return JSON.stringify(payload, null, 4);
   }
 
   payload.error = true;
   payload.message = 'TODO';
-  res.end(JSON.stringify(payload, null, 4));
+  return JSON.stringify(payload, null, 4);
 };
