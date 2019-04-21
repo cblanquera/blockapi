@@ -1,4 +1,4 @@
-import BlockchainException from '../BlockchainException';
+import Exception from '../Exception';
 
 /**
  * Blockchain contract
@@ -10,7 +10,7 @@ export default class BlockchainInterface {
    * @return BlockchainInterface
    */
   async generate() {
-    throw BlockchainException.forUndefinedAbstract('generate');
+    throw Exception.forUndefinedAbstract('generate');
   }
 
   /**
@@ -19,7 +19,7 @@ export default class BlockchainInterface {
    * @return BlockchainInterface
    */
   async getBalance() {
-    throw BlockchainException.forUndefinedAbstract('getBalance');
+    throw Exception.forUndefinedAbstract('getBalance');
   }
 
   /**
@@ -28,7 +28,7 @@ export default class BlockchainInterface {
    * @return BlockchainInterface
    */
   async loadFromPrivateKey(privateKey) {
-    throw BlockchainException.forUndefinedAbstract('loadFromPrivateKey');
+    throw Exception.forUndefinedAbstract('loadFromPrivateKey');
   }
 
   /**
@@ -37,6 +37,6 @@ export default class BlockchainInterface {
    * @return BlockchainInterface
    */
   async signTransaction(data = {}) {
-    throw BlockchainException.forUndefinedAbstract('signTransaction');
+    throw Exception.forUndefinedAbstract('signTransaction');
   }
 }

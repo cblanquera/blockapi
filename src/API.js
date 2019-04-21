@@ -9,7 +9,13 @@ class API {
    * @return {*}
    */
   config(path, key) {
-    const config = require('../../config/' + path);
+    let config = null;
+    switch (path) {
+      case 'services':
+        config = require('../config/services');
+        break;
+    }
+
     if (key && config[key]) {
         return config[key];
     }

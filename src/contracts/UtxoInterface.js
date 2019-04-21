@@ -1,7 +1,7 @@
-import BlockchainException from '../BlockchainException';
+import Exception from '../Exception';
 
 export default class UtxoInterface {
     async getUtxo(address) {
-        throw BlockchainException.forUndefinedAbstract('getUtxo');
+        throw Exception.forUndefinedAbstract('getUtxo');
     }
 }
