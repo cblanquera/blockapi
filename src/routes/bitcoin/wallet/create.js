@@ -1,6 +1,6 @@
 import { parse } from 'url';
 
-import BitcoinService from '../../../../services/Bitcoin';
+import BitcoinService from '../../../services/Bitcoin';
 
 export default async (req) => {
   const payload = { error: false };
