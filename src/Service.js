@@ -3,7 +3,7 @@ import Ethereum from './services/Ethereum';
 import Litecoin from './services/Litecoin';
 import NEM from './services/NEM';
 import Stellar from './services/Stellar';
-import BlockchainException from './BlockchainException';
+import Exception from './Exception';
 
 export default class Service {
   /**
@@ -36,7 +36,7 @@ export default class Service {
         return new Stellar();
         break;
       default:
-        throw BlockchainException.forNotFound('currency', type);
+        throw Exception.forNotFound('currency', type);
         break;
     }
   }

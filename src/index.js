@@ -16,7 +16,7 @@ export default async (req) => {
   let response = '{"error": "true", "message": "No route found."}';
   await forEach(routes, async (route) => {
     if (route.src === pathname) {
-        let promise = require('../' + route.dest);
+        let promise = require('.' + route.dest);
         response = await promise(req);
     }
   });

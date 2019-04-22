@@ -2,8 +2,7 @@ import CryptoJS from 'crypto-js';
 
 import app from '@library/AppHandler';
 
-import API from '../../API';
-import BlockchainException from '../BlockchainException';
+import Exception from '../Exception';
 import BlockchainInterface from '../contracts/BlockchainInterface';
 
 /**
@@ -13,14 +12,10 @@ export default class NEM extends BlockchainInterface {
   /**
    * NEM Blockchain Class Constructor
    */
-  constructor() {
+  constructor(live = false, logger = console) {
     super();
 
-    const settings = app.config('settings');
-
-    // instantiate
-    this.api = new API(settings);
-    this.isDev = false;
+    this.logger = logger;
   }
 
   /**
@@ -29,21 +24,7 @@ export default class NEM extends BlockchainInterface {
    * @return {Object}
    */
   async generate() {
-    let api = this.api;
-
-    if (this.isDev) {
-      api = api.setAsDev(true);
-    }
-
-    api.authenticated();
-    const response = await api.post('wallets/generate/xem');
-
-    return {
-      address: response.data.address,
-      key: response.data.private_key,
-      mnemonic: '',
-      public: response.data.public_key
-    };
+    throw Exception.for('TODO generate()');
   }
 
   /**
@@ -54,8 +35,7 @@ export default class NEM extends BlockchainInterface {
    * @return {String}
    */
   async getBalance(address) {
-    let results = await this.getBalance('XEM', address);
-    return String(results.balance);
+    throw Exception.for('TODO getBalance()');
   }
 
   /**
@@ -66,54 +46,17 @@ export default class NEM extends BlockchainInterface {
    * @return {Promise}
    */
   async loadFromPrivateKey(privateKey) {
-    app.log('[NEM]', 'Unlocking wallet...');
-
-    let api = this.api;
-
-    if (this.isDev) {
-      api = api.setAsDev(true);
-    }
-
-    api.authenticated().encrypted();
-
-    const response = await api.post('wallets/extract/xem', {
-        wallet_key: privateKey
-    });
-
-    return {
-      address: response.data.address,
-      key: privateKey,
-      mnemonic: '',
-      public: response.data.public_key
-    };
+    throw Exception.for('TODO loadFromPrivateKey()');
   }
 
   /**
-   * Signs a transaction for a Litecoin wallet.
+   * Signs a transaction for a NEM wallet.
    *
    * @param {Object} data
    *
    * @return {Promise}
    */
   async signTransaction(data = {}) {
-    const rawData = CryptoJS.AES.encrypt(
-        JSON.stringify(data),
-        settings.salt
-    );
-
-    // return it back
-    return rawData.toString();
-  }
-
-  /**
-   * Sets the api call as a dev request
-   *
-   * @param {Boolean} [dev]
-   *
-   * @return {Class}
-   */
-  setDev(dev = true) {
-    this.isDev = dev;
-    return this;
+    throw Exception.for('TODO signTransaction()');
   }
 }

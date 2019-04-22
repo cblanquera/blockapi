@@ -2,8 +2,7 @@ import CryptoJS from 'crypto-js';
 
 import app from '@library/AppHandler';
 
-import API from '../../API';
-import BlockchainException from '../BlockchainException';
+import Exception from '../Exception';
 import BlockchainInterface from '../contracts/BlockchainInterface';
 
 /**
@@ -13,13 +12,10 @@ export default class Stellar extends BlockchainInterface {
   /**
    * Stellar Blockchain Class Constructor
    */
-  constructor() {
+  constructor(live = false, logger = console) {
     super();
 
-    const settings = app.config('settings');
-
-    // instantiate
-    this.api = new API(settings);
+    this.logger = logger;
   }
 
   /**
@@ -28,22 +24,7 @@ export default class Stellar extends BlockchainInterface {
    * @return {Object}
    */
   async generate() {
-    let api = this.api;
-
-    if (this.isDev) {
-      api = api.setAsDev(true);
-    }
-
-    api.authenticated();
-
-    const response = await api.post('wallets/generate/xlm');
-
-    return {
-      address: response.data.public,
-      key: response.data.secret,
-      mnemonic: '',
-      public: ''
-    };
+    throw Exception.for('TODO generate()');
   }
 
   /**
@@ -54,8 +35,7 @@ export default class Stellar extends BlockchainInterface {
    * @return {String}
    */
   async getBalance(address) {
-    let results = await this.getBalance('XLM', address);
-    return String(parseFloat(results.balance) * 10 ** 7);
+    throw Exception.for('TODO getBalance()');
   }
 
   /**
@@ -63,57 +43,20 @@ export default class Stellar extends BlockchainInterface {
    *
    * @param {String} privateKey
    *
-   * @return {Object}
+   * @return {Promise}
    */
   async loadFromPrivateKey(privateKey) {
-    app.log('[XLM]', 'Unlocking wallet...');
-
-    let api = this.api;
-
-    if (this.isDev) {
-      api = api.setAsDev(true);
-    }
-
-    api.authenticated().encrypted();
-    let response = await api.post('wallets/extract/xlm', {
-        wallet_key: privateKey
-    });
-
-    return {
-      address: response.data.public_key,
-      key: privateKey,
-      mnemonic: '',
-      public: ''
-    };
+    throw Exception.for('TODO loadFromPrivateKey()');
   }
 
   /**
-  * Encrypts the transaction data and we'll let the the server to process and
-  * send the transaction to the blockchain.
-  *
-  * @param {Object} data
-  *
-  * @return {String}
-  */
-  async signTransaction(data = {}) {
-    const rawData = CryptoJS.AES.encrypt(
-        JSON.stringify(data),
-        settings.salt
-    );
-
-    // return it back
-    return rawData.toString();
-  }
-
-  /**
-   * Sets the api call as a dev request
+   * Signs a transaction for a Stellar wallet.
    *
-   * @param {Boolean} [dev]
+   * @param {Object} data
    *
-   * @return {Class}
+   * @return {Promise}
    */
-  setDev(dev = true) {
-    this.isDev = dev;
-    return this;
+  async signTransaction(data = {}) {
+    throw Exception.for('TODO signTransaction()');
   }
 }
