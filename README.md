@@ -8,13 +8,13 @@ Ethereum, Litecoin, Stellar and NEM.
 These are free APIs to use to help develop your blockchain based app. The
 following URL is where this code is deployed.
 
-**[https://blockapi.cblanquera.now.sh/](https://blockapi.cblanquera.now.sh)**
+**[https://blockapi-git-master.cblanquera.now.sh/](https://blockapi-git-master.cblanquera.now.sh/)**
 
 Please see the **API Calls** section to see the available endpoints. A sample
 URI formation would look like the following.
 
 ```
-https://blockapi.cblanquera.now.sh/bitcoin/wallet/create
+https://blockapi-git-master.cblanquera.now.sh/bitcoin/wallet/create
 ```
 
 ## Disclaimer
