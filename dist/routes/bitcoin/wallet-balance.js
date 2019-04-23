@@ -31,12 +31,12 @@ exports.default = async function (req) {
 
   var service = new _Bitcoin2.default(live);
 
-  //try {
-  payload.results = await service.getBalance(address);
-  //} catch (e) {
-  //payload.error = true;
-  //payload.message = e.message;
-  //}
+  try {
+    payload.results = await service.getBalance(address);
+  } catch (e) {
+    payload.error = true;
+    payload.message = e.message;
+  }
 
   return JSON.stringify(payload, null, 4);
 };
