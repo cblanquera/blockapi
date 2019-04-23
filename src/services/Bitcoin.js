@@ -75,7 +75,7 @@ export default class Bitcoin extends BlockchainInterface {
   }
 
   /**
-   * Get Balance
+   * Get all of UTXO's a given address.
    *
    * @param {String} address
    *

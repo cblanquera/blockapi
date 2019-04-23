@@ -6,6 +6,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _url = require('url');
 
+var _Stellar = require('../../services/Stellar');
+
+var _Stellar2 = _interopRequireDefault(_Stellar);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 exports.default = async function (req) {
   var _parse = (0, _url.parse)(req.url, true),
       query = _parse.query;
@@ -23,8 +29,15 @@ exports.default = async function (req) {
     return JSON.stringify(payload, null, 4);
   }
 
-  payload.error = true;
-  payload.message = 'TODO';
+  var service = new _Stellar2.default(live);
+
+  try {
+    payload.results = await service.loadFromPrivateKey(pk);
+  } catch (e) {
+    payload.error = true;
+    payload.message = e.message;
+  }
+
   return JSON.stringify(payload, null, 4);
 };
 

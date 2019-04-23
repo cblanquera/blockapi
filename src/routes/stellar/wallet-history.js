@@ -1,5 +1,7 @@
 import { parse } from 'url';
 
+import StellarService from '../../services/Stellar';
+
 export default async (req) => {
   const { query } = parse(req.url, true);
   const { address, live = false } = query;
@@ -12,7 +14,14 @@ export default async (req) => {
     return JSON.stringify(payload, null, 4);
   }
 
-  payload.error = true;
-  payload.message = 'TODO';
+  const service = new StellarService(live);
+
+  try {
+    payload.results = await service.getHistory(address);
+  } catch (e) {
+    payload.error = true;
+    payload.message = e.message;
+  }
+
   return JSON.stringify(payload, null, 4);
 };

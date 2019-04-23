@@ -32,7 +32,7 @@ var URLS = {
         "url_info": "https://test-insight.bitpay.com/api/addr/%s"
     },
     "live": {
-        "url_utxo": "https://test-insight.bitpay.com/api/addr/%s/utxo",
+        "url_utxo": "https://insight.bitpay.com/api/addr/%s/utxo",
         "url_info": "https://test-insight.bitpay.com/api/addr/%s"
     }
 };

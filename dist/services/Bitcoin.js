@@ -131,7 +131,7 @@ var Bitcoin = function (_BlockchainInterface) {
     }
 
     /**
-     * Get Balance
+     * Get all of UTXO's a given address.
      *
      * @param {String} address
      *

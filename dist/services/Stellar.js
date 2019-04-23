@@ -6,14 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _cryptoJs = require('crypto-js');
-
-var _cryptoJs2 = _interopRequireDefault(_cryptoJs);
-
-var _AppHandler = require('@library/AppHandler');
-
-var _AppHandler2 = _interopRequireDefault(_AppHandler);
-
 var _stellarSdk = require('stellar-sdk');
 
 var _stellarSdk2 = _interopRequireDefault(_stellarSdk);
@@ -29,6 +21,10 @@ var _Exception2 = _interopRequireDefault(_Exception);
 var _BlockchainInterface2 = require('../contracts/BlockchainInterface');
 
 var _BlockchainInterface3 = _interopRequireDefault(_BlockchainInterface2);
+
+var _Horizon = require('../resources/Horizon');
+
+var _Horizon2 = _interopRequireDefault(_Horizon);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56,11 +52,7 @@ var Stellar = function (_BlockchainInterface) {
     var _this = _possibleConstructorReturn(this, (Stellar.__proto__ || Object.getPrototypeOf(Stellar)).call(this));
 
     _this.logger = logger;
-
-    _this.network = '';
-    if (live) {
-      _this.network = '';
-    }
+    _this.live = live;
     return _this;
   }
 
@@ -79,8 +71,8 @@ var Stellar = function (_BlockchainInterface) {
 
       // return whatever we have generated here
       return {
-        public: pair.publicKey(),
-        secret: pair.secret()
+        address: pair.publicKey(),
+        key: pair.secret()
       };
     }
 
@@ -95,26 +87,31 @@ var Stellar = function (_BlockchainInterface) {
   }, {
     key: 'getBalance',
     value: async function getBalance(address) {
-      // init server
-      _stellarSdk2.default.Network.useTestNetwork();
-      var server = new _stellarSdk2.default.Server(testNetUrl);
+      this.logger.log('[XLM]', 'Fetching info...');
 
-      if (settings.env === 'production') {
-        // set test network and server
-        _stellarSdk2.default.Network.usePublicNetwork();
-        server = new _stellarSdk2.default.Server(liveNetUrl);
-      }
+      var resource = _Horizon2.default.load(this.live);
+      var results = await resource.getBalance(address);
 
-      // set the request
-      return new Promise(function (resolve, reject) {
-        server.loadAccount(publicKey).then(function (account) {
-          // return whatever we have
-          resolve(account.balances);
-        }).catch(function (error) {
-          // return error
-          reject(error);
-        });
-      });
+      return results;
+    }
+
+    /**
+     * Fetches the transactions of the given address.
+     * 
+     * @param {String} address 
+     * 
+     * @return {Array}
+     */
+
+  }, {
+    key: 'getHistory',
+    value: async function getHistory(address) {
+      this.logger.log('[XLM]', 'Fetching transactions...');
+
+      var resource = _Horizon2.default.load(this.live);
+      var results = await resource.getTransactions(address);
+
+      return results;
     }
 
     /**
@@ -128,7 +125,18 @@ var Stellar = function (_BlockchainInterface) {
   }, {
     key: 'loadFromPrivateKey',
     value: async function loadFromPrivateKey(privateKey) {
-      throw _Exception2.default.for('TODO loadFromPrivateKey()');
+      // validate if the given private key is valid
+      if (!_stellarBase2.default.StrKey.isValidEd25519SecretSeed(privateKey)) {
+        throw _Exception2.default.for('Invalid private key.');
+      }
+
+      // get the source keys
+      var keys = _stellarSdk2.default.Keypair.fromSecret(privateKey);
+
+      return {
+        address: keys.publicKey(),
+        key: keys.secret()
+      };
     }
 
     /**

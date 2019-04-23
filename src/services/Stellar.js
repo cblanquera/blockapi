@@ -1,12 +1,9 @@
-import CryptoJS from 'crypto-js';
-
-import app from '@library/AppHandler';
-
 import StellarSdk from 'stellar-sdk';
 import StellarBase from 'stellar-base';
 
 import Exception from '../Exception';
 import BlockchainInterface from '../contracts/BlockchainInterface';
+import Horizon from '../resources/Horizon';
 
 /**
  * Stellar Blockchain Class
@@ -19,11 +16,7 @@ export default class Stellar extends BlockchainInterface {
     super();
 
     this.logger = logger;
-
-    this.network = '';
-    if (live) {
-      this.network = '';
-    }
+    this.live = live;
   }
 
   /**
@@ -37,8 +30,8 @@ export default class Stellar extends BlockchainInterface {
 
     // return whatever we have generated here
     return {
-      public: pair.publicKey(),
-      secret: pair.secret()
+      address: pair.publicKey(),
+      key: pair.secret()
     };
   }
 
@@ -50,27 +43,28 @@ export default class Stellar extends BlockchainInterface {
    * @return {String}
    */
   async getBalance(address) {
-    // init server
-    StellarSdk.Network.useTestNetwork();
-    let server = new StellarSdk.Server(testNetUrl);
+    this.logger.log('[XLM]', 'Fetching info...');
+    
+    const resource = Horizon.load(this.live);
+    const results = await resource.getBalance(address);
 
-    if (settings.env === 'production') {
-      // set test network and server
-      StellarSdk.Network.usePublicNetwork();
-      server = new StellarSdk.Server(liveNetUrl);
-    }
+    return results;
+  }
 
-    // set the request
-    return new Promise((resolve, reject) => {
-      server.loadAccount(publicKey)
-        .then((account) => {
-          // return whatever we have
-          resolve(account.balances);
-        }).catch((error) => {
-          // return error
-          reject(error);
-        });
-    });
+  /**
+   * Fetches the transactions of the given address.
+   * 
+   * @param {String} address 
+   * 
+   * @return {Array}
+   */
+  async getHistory(address) {
+    this.logger.log('[XLM]', 'Fetching transactions...');
+
+    const resource = Horizon.load(this.live);
+    const results = await resource.getTransactions(address);
+
+    return results;
   }
 
   /**
@@ -81,7 +75,18 @@ export default class Stellar extends BlockchainInterface {
    * @return {Promise}
    */
   async loadFromPrivateKey(privateKey) {
-    throw Exception.for('TODO loadFromPrivateKey()');
+    // validate if the given private key is valid
+    if (!StellarBase.StrKey.isValidEd25519SecretSeed(privateKey)) {
+      throw Exception.for('Invalid private key.')
+    }
+
+    // get the source keys
+    const keys = StellarSdk.Keypair.fromSecret(privateKey);
+
+    return {
+      address: keys.publicKey(),
+      key: keys.secret()
+    }
   }
 
   /**
