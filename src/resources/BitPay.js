@@ -11,7 +11,7 @@ const URLS = {
   "live": {
     "url_utxo": "https://test-insight.bitpay.com/api/addr/%s/utxo",
     "url_info": "https://test-insight.bitpay.com/api/addr/%s"
-  },
+  }
 };
 
 export default class BitPay extends UtxoInterface {

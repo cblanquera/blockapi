@@ -11,7 +11,7 @@ const URLS = {
   "live": {
     "token": "78adc26f4d8e4cbfbab5381c090f90b3",
     "url_utxo": "https://api.blockcypher.com/v1/btc/test3/addrs/%s?limit=2000&after=%s&token=%s"
-  },
+  }
 };
 
 export default class BlockCypher extends UtxoInterface {

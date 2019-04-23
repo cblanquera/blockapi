@@ -11,7 +11,7 @@ const URLS = {
   "live": {
     "url_utxo": "https://testnet.litecore.io/api/addr/%s/utxo",
     "url_info": "https://testnet.litecore.io/api/addr/%s"
-  },
+  }
 };
 
 export default class LiteCore extends UtxoInterface {
