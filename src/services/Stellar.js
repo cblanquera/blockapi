@@ -2,6 +2,9 @@ import CryptoJS from 'crypto-js';
 
 import app from '@library/AppHandler';
 
+import StellarSdk from 'stellar-sdk';
+import StellarBase from 'stellar-base';
+
 import Exception from '../Exception';
 import BlockchainInterface from '../contracts/BlockchainInterface';
 
@@ -16,6 +19,11 @@ export default class Stellar extends BlockchainInterface {
     super();
 
     this.logger = logger;
+
+    this.network = '';
+    if (live) {
+      this.network = '';
+    }
   }
 
   /**
@@ -24,7 +32,14 @@ export default class Stellar extends BlockchainInterface {
    * @return {Object}
    */
   async generate() {
-    throw Exception.for('TODO generate()');
+    // generate keys
+    const pair = StellarSdk.Keypair.random();
+
+    // return whatever we have generated here
+    return {
+      public: pair.publicKey(),
+      secret: pair.secret()
+    };
   }
 
   /**
@@ -35,7 +50,27 @@ export default class Stellar extends BlockchainInterface {
    * @return {String}
    */
   async getBalance(address) {
-    throw Exception.for('TODO getBalance()');
+    // init server
+    StellarSdk.Network.useTestNetwork();
+    let server = new StellarSdk.Server(testNetUrl);
+
+    if (settings.env === 'production') {
+      // set test network and server
+      StellarSdk.Network.usePublicNetwork();
+      server = new StellarSdk.Server(liveNetUrl);
+    }
+
+    // set the request
+    return new Promise((resolve, reject) => {
+      server.loadAccount(publicKey)
+        .then((account) => {
+          // return whatever we have
+          resolve(account.balances);
+        }).catch((error) => {
+          // return error
+          reject(error);
+        });
+    });
   }
 
   /**

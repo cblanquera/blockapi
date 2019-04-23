@@ -60,13 +60,11 @@ var Ethereum = function (_BlockchainInterface) {
     // setup the btc network
     _this.network = 'rinkeby';
     if (live) {
-      _this.network = bitcoin.networks.bitcoin;
+      _this.network = 'mainnet';
     }
 
-    _this.network = 'mainnet';
-
     // setup the provider
-    _this.provider = _ethers.ethers.getDefaultProvider(network);
+    _this.provider = _ethers.ethers.getDefaultProvider(_this.network);
     return _this;
   }
 
@@ -117,13 +115,34 @@ var Ethereum = function (_BlockchainInterface) {
         address = '0x' + address;
       }
 
-      var balance = this.provider.getBalance(address);
+      var balance = await this.provider.getBalance(address);
 
       if (typeof balance.message !== 'undefined') {
         throw _Exception2.default.forNotFound('Wallet Address', address);
       }
 
       return balance.toString();
+    }
+
+    /**
+     * Get Balance
+     *
+     * @param {String} address
+     *
+     * @return {String}
+     */
+
+  }, {
+    key: 'getHistory',
+    value: async function getHistory(address) {
+      this.logger.log('[ETH]', 'Fetching info...');
+
+      var etherscanProvider = new _ethers.ethers.providers.EtherscanProvider();
+      var results = await etherscanProvider.getHistory(address);
+
+      console.log(results);
+
+      return results;
     }
 
     /**

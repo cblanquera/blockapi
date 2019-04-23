@@ -19,11 +19,12 @@ export default class Litecoin extends BlockchainInterface {
   constructor(live = false, logger = console) {
     super();
 
+    this.live = live;
     this.logger = logger;
 
     // setup the btc network
     this.network = {};
-    if (live) {
+    if (!live) {
       this.network = {
         messagePrefix: '\x19Litecoin Signed Message:\n',
         bip32: {
@@ -73,8 +74,28 @@ export default class Litecoin extends BlockchainInterface {
    * @return {String}
    */
   async getBalance(address) {
-    let results = await this.getBalance('LTC', address);
-    return String(results.final);
+    this.logger.log('[Litecoin]', 'Fetching info...');
+
+    const resource = LiteCore.load(this.live);
+    const results = await resource.getInfo(address);
+
+    return String(results.balanceSat);
+  }
+
+  /**
+   * Get Balance
+   *
+   * @param {String} address
+   *
+   * @return {String}
+   */
+  async getHistory(address) {
+    this.logger.log('[BTC]', 'Fetching info...');
+
+    const resource = LiteCore.load(this.live);
+    const results = await resource.getUtxo(address);
+
+    return results;
   }
 
   /**
@@ -121,7 +142,7 @@ export default class Litecoin extends BlockchainInterface {
       throw Exception.for('Recipient is required.');
     }
 
-    this.logger.log('[Bitcoin]', 'Unlocking wallet.');
+    this.logger.log('[LTC]', 'Unlocking wallet.');
 
     let ltcKeyPair = bitcoin.ECPair.fromWIF(data.key, this.network);
 
@@ -133,7 +154,8 @@ export default class Litecoin extends BlockchainInterface {
 
     this.logger.log('[LTC]', 'Fetching UTXOs...');
 
-    let utxos = await LiteCore.getUtxo(hash.address);
+    const resource = LiteCore.load(this.live);
+    let utxos = await resource.getUtxo(hash.address);
 
     this.logger.log('[LTC]', 'Building transaction...');
 

@@ -6,11 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _url = require('url');
 
-var _routes = require('../config/routes');
-
-var _routes2 = _interopRequireDefault(_routes);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _now = require('../now');
 
 async function forEach(list, callback) {
   for (var results, index = 0; index < list.length; index++) {
@@ -25,9 +21,9 @@ exports.default = async function (req) {
       pathname = _parse.pathname;
 
   var response = '{"error": "true", "message": "No route found."}';
-  await forEach(_routes2.default, async function (route) {
+  await forEach(_now.routes, async function (route) {
     if (route.src === pathname) {
-      var promise = require('../' + route.dest);
+      var promise = require('..' + route.dest);
       response = await promise(req);
     }
   });

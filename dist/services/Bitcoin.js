@@ -30,6 +30,10 @@ var _Exception = require('../Exception');
 
 var _Exception2 = _interopRequireDefault(_Exception);
 
+var _BitPay = require('../resources/BitPay');
+
+var _BitPay2 = _interopRequireDefault(_BitPay);
+
 var _BlockCypher = require('../resources/BlockCypher');
 
 var _BlockCypher2 = _interopRequireDefault(_BlockCypher);
@@ -63,6 +67,7 @@ var Bitcoin = function (_BlockchainInterface) {
 
     var _this = _possibleConstructorReturn(this, (Bitcoin.__proto__ || Object.getPrototypeOf(Bitcoin)).call(this));
 
+    _this.live = live;
     _this.logger = logger;
 
     // setup the btc network
@@ -117,8 +122,31 @@ var Bitcoin = function (_BlockchainInterface) {
   }, {
     key: 'getBalance',
     value: async function getBalance(address) {
-      var results = await this.getBalance('BTC', address);
-      return String(results.final);
+      this.logger.log('[BTC]', 'Fetching info...');
+
+      var resource = _BitPay2.default.load(this.live);
+      var results = await resource.getInfo(address);
+
+      return String(results.balanceSat);
+    }
+
+    /**
+     * Get Balance
+     *
+     * @param {String} address
+     *
+     * @return {String}
+     */
+
+  }, {
+    key: 'getHistory',
+    value: async function getHistory(address) {
+      this.logger.log('[BTC]', 'Fetching info...');
+
+      var resource = _BlockCypher2.default.load(this.live);
+      var results = await resource.getUtxo(address);
+
+      return results;
     }
 
     /**
@@ -175,7 +203,7 @@ var Bitcoin = function (_BlockchainInterface) {
         throw _Exception2.default.for('Recipient is required.');
       }
 
-      this.logger.log('[Bitcoin]', 'Unlocking wallet.');
+      this.logger.log('[BTC]', 'Unlocking wallet.');
 
       var btcKeyPair = _bitcoinjsLib2.default.ECPair.fromWIF(data.key, this.network);
 
@@ -185,11 +213,12 @@ var Bitcoin = function (_BlockchainInterface) {
         network: this.network
       });
 
-      this.logger.log('[Bitcoin]', 'Fetching UTXOs...');
+      this.logger.log('[BTC]', 'Fetching UTXOs...');
 
-      var utxos = await _BlockCypher2.default.getUtxo(hash.address);
+      var resource = _BlockCypher2.default.load(this.live);
+      var utxos = await resource.getUtxo(hash.address);
 
-      this.logger.log('[Bitcoin]', 'Building transaction...');
+      this.logger.log('[BTC]', 'Building transaction...');
 
       // set the key pair again
       btcKeyPair = _bitcoinjsLib2.default.ECPair.fromWIF(data.key, this.network);

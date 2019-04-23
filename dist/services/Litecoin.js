@@ -63,11 +63,12 @@ var Litecoin = function (_BlockchainInterface) {
 
     var _this = _possibleConstructorReturn(this, (Litecoin.__proto__ || Object.getPrototypeOf(Litecoin)).call(this));
 
+    _this.live = live;
     _this.logger = logger;
 
     // setup the btc network
     _this.network = {};
-    if (live) {
+    if (!live) {
       _this.network = {
         messagePrefix: '\x19Litecoin Signed Message:\n',
         bip32: {
@@ -126,8 +127,31 @@ var Litecoin = function (_BlockchainInterface) {
   }, {
     key: 'getBalance',
     value: async function getBalance(address) {
-      var results = await this.getBalance('LTC', address);
-      return String(results.final);
+      this.logger.log('[Litecoin]', 'Fetching info...');
+
+      var resource = _LiteCore2.default.load(this.live);
+      var results = await resource.getInfo(address);
+
+      return String(results.balanceSat);
+    }
+
+    /**
+     * Get Balance
+     *
+     * @param {String} address
+     *
+     * @return {String}
+     */
+
+  }, {
+    key: 'getHistory',
+    value: async function getHistory(address) {
+      this.logger.log('[BTC]', 'Fetching info...');
+
+      var resource = _LiteCore2.default.load(this.live);
+      var results = await resource.getUtxo(address);
+
+      return results;
     }
 
     /**
@@ -184,7 +208,7 @@ var Litecoin = function (_BlockchainInterface) {
         throw _Exception2.default.for('Recipient is required.');
       }
 
-      this.logger.log('[Bitcoin]', 'Unlocking wallet.');
+      this.logger.log('[LTC]', 'Unlocking wallet.');
 
       var ltcKeyPair = _bitcoinjsLib2.default.ECPair.fromWIF(data.key, this.network);
 
@@ -196,7 +220,8 @@ var Litecoin = function (_BlockchainInterface) {
 
       this.logger.log('[LTC]', 'Fetching UTXOs...');
 
-      var utxos = await _LiteCore2.default.getUtxo(hash.address);
+      var resource = _LiteCore2.default.load(this.live);
+      var utxos = await resource.getUtxo(hash.address);
 
       this.logger.log('[LTC]', 'Building transaction...');
 

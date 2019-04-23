@@ -14,6 +14,14 @@ var _AppHandler = require('@library/AppHandler');
 
 var _AppHandler2 = _interopRequireDefault(_AppHandler);
 
+var _stellarSdk = require('stellar-sdk');
+
+var _stellarSdk2 = _interopRequireDefault(_stellarSdk);
+
+var _stellarBase = require('stellar-base');
+
+var _stellarBase2 = _interopRequireDefault(_stellarBase);
+
 var _Exception = require('../Exception');
 
 var _Exception2 = _interopRequireDefault(_Exception);
@@ -48,6 +56,11 @@ var Stellar = function (_BlockchainInterface) {
     var _this = _possibleConstructorReturn(this, (Stellar.__proto__ || Object.getPrototypeOf(Stellar)).call(this));
 
     _this.logger = logger;
+
+    _this.network = '';
+    if (live) {
+      _this.network = '';
+    }
     return _this;
   }
 
@@ -61,7 +74,14 @@ var Stellar = function (_BlockchainInterface) {
   _createClass(Stellar, [{
     key: 'generate',
     value: async function generate() {
-      throw _Exception2.default.for('TODO generate()');
+      // generate keys
+      var pair = _stellarSdk2.default.Keypair.random();
+
+      // return whatever we have generated here
+      return {
+        public: pair.publicKey(),
+        secret: pair.secret()
+      };
     }
 
     /**
@@ -75,7 +95,26 @@ var Stellar = function (_BlockchainInterface) {
   }, {
     key: 'getBalance',
     value: async function getBalance(address) {
-      throw _Exception2.default.for('TODO getBalance()');
+      // init server
+      _stellarSdk2.default.Network.useTestNetwork();
+      var server = new _stellarSdk2.default.Server(testNetUrl);
+
+      if (settings.env === 'production') {
+        // set test network and server
+        _stellarSdk2.default.Network.usePublicNetwork();
+        server = new _stellarSdk2.default.Server(liveNetUrl);
+      }
+
+      // set the request
+      return new Promise(function (resolve, reject) {
+        server.loadAccount(publicKey).then(function (account) {
+          // return whatever we have
+          resolve(account.balances);
+        }).catch(function (error) {
+          // return error
+          reject(error);
+        });
+      });
     }
 
     /**

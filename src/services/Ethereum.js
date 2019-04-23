@@ -24,13 +24,11 @@ export default class Ethereum extends BlockchainInterface {
     // setup the btc network
     this.network = 'rinkeby';
     if (live) {
-      this.network = bitcoin.networks.bitcoin;
+      this.network = 'mainnet';
     }
 
-    this.network = 'mainnet';
-
     // setup the provider
-    this.provider = ethers.getDefaultProvider(network);
+    this.provider = ethers.getDefaultProvider(this.network);
   }
 
   /**
@@ -73,13 +71,31 @@ export default class Ethereum extends BlockchainInterface {
       address = `0x${address}`;
     }
 
-    const balance = this.provider.getBalance(address);
+    const balance = await this.provider.getBalance(address);
 
     if (typeof balance.message !== 'undefined') {
       throw Exception.forNotFound('Wallet Address', address);
     }
 
     return balance.toString();
+  }
+
+  /**
+   * Get Balance
+   *
+   * @param {String} address
+   *
+   * @return {String}
+   */
+  async getHistory(address) {
+    this.logger.log('[ETH]', 'Fetching info...');
+
+    let etherscanProvider = new ethers.providers.EtherscanProvider();
+    let results = await etherscanProvider.getHistory(address);
+
+    console.log(results)
+
+    return results;
   }
 
   /**

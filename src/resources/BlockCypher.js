@@ -1,14 +1,30 @@
-import fetch from 'isomorphic-unfetch';
+import axios from 'axios';
 
 import UtxoInterface from '../contracts/UtxoInterface';
 import Exception from '../Exception';
 
-import API from '../API';
+const URLS = {
+  "test": {
+    "token": "78adc26f4d8e4cbfbab5381c090f90b3",
+    "url_utxo": "https://api.blockcypher.com/v1/btc/test3/addrs/%s?limit=2000&after=%s&token=%s"
+  },
+  "live": {
+    "token": "78adc26f4d8e4cbfbab5381c090f90b3",
+    "url_utxo": "https://api.blockcypher.com/v1/btc/test3/addrs/%s?limit=2000&after=%s&token=%s"
+  },
+};
 
-class BlockCypher extends UtxoInterface {
-    constructor() {
+export default class BlockCypher extends UtxoInterface {
+    constructor(live = false) {
         super();
-        this.settings = API.config('services', 'blockcypher');
+        this.settings = URLS.test;
+        if (live) {
+            this.settings = URLS.live;
+        }
+    }
+
+    static load(live = false) {
+      return new BlockCypher(live);
     }
 
     async getUtxo(address, utxos = [], maxHeight = 0) {
@@ -17,7 +33,7 @@ class BlockCypher extends UtxoInterface {
             .replace('%s', maxHeight)
             .replace('%s', this.settings.token);
 
-        const response = await fetch(url);
+        const response = await axios.get(url);
         const body = response.data;
 
         // do we have data?
@@ -29,7 +45,8 @@ class BlockCypher extends UtxoInterface {
         }
 
         body.txrefs = body.txrefs || {};
-        for (let txref of body.txrefs) {
+        Object.keys(body.txrefs).forEach(key => {
+          const txref = body.txrefs[key];
           // set max height for later
           maxHeight = Math.max(maxHeight, txref.block_height) + 1;
 
@@ -40,7 +57,7 @@ class BlockCypher extends UtxoInterface {
             // push this ref
             utxos.push(txref);
           }
-        }
+        });
 
         if (typeof body.hasMore !== 'undefined') {
           return await BlockCypher.getUtxo(address, utxos, maxHeight);
@@ -53,5 +70,3 @@ class BlockCypher extends UtxoInterface {
         return utxos.concat(body.unconfirmed_txrefs);
     }
 }
-
-export default new BlockCypher();

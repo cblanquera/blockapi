@@ -1,6 +1,6 @@
 import { parse } from 'url';
 
-import routes from '../config/routes';
+import { routes } from '../now';
 
 async function forEach(list, callback) {
   for (let results, index = 0; index < list.length; index++) {
@@ -16,7 +16,7 @@ export default async (req) => {
   let response = '{"error": "true", "message": "No route found."}';
   await forEach(routes, async (route) => {
     if (route.src === pathname) {
-        let promise = require('.' + route.dest);
+        let promise = require('..' + route.dest);
         response = await promise(req);
     }
   });
