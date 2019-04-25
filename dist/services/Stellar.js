@@ -6,14 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _cryptoJs = require('crypto-js');
-
-var _cryptoJs2 = _interopRequireDefault(_cryptoJs);
-
-var _AppHandler = require('@library/AppHandler');
-
-var _AppHandler2 = _interopRequireDefault(_AppHandler);
-
 var _stellarSdk = require('stellar-sdk');
 
 var _stellarSdk2 = _interopRequireDefault(_stellarSdk);
@@ -22,6 +14,10 @@ var _stellarBase = require('stellar-base');
 
 var _stellarBase2 = _interopRequireDefault(_stellarBase);
 
+var _validator = require('validator');
+
+var _validator2 = _interopRequireDefault(_validator);
+
 var _Exception = require('../Exception');
 
 var _Exception2 = _interopRequireDefault(_Exception);
@@ -29,6 +25,10 @@ var _Exception2 = _interopRequireDefault(_Exception);
 var _BlockchainInterface2 = require('../contracts/BlockchainInterface');
 
 var _BlockchainInterface3 = _interopRequireDefault(_BlockchainInterface2);
+
+var _Horizon = require('../resources/Horizon');
+
+var _Horizon2 = _interopRequireDefault(_Horizon);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56,11 +56,7 @@ var Stellar = function (_BlockchainInterface) {
     var _this = _possibleConstructorReturn(this, (Stellar.__proto__ || Object.getPrototypeOf(Stellar)).call(this));
 
     _this.logger = logger;
-
-    _this.network = '';
-    if (live) {
-      _this.network = '';
-    }
+    _this.live = live;
     return _this;
   }
 
@@ -79,8 +75,8 @@ var Stellar = function (_BlockchainInterface) {
 
       // return whatever we have generated here
       return {
-        public: pair.publicKey(),
-        secret: pair.secret()
+        address: pair.publicKey(),
+        key: pair.secret()
       };
     }
 
@@ -95,26 +91,31 @@ var Stellar = function (_BlockchainInterface) {
   }, {
     key: 'getBalance',
     value: async function getBalance(address) {
-      // init server
-      _stellarSdk2.default.Network.useTestNetwork();
-      var server = new _stellarSdk2.default.Server(testNetUrl);
+      this.logger.log('[XLM]', 'Fetching info...');
 
-      if (settings.env === 'production') {
-        // set test network and server
-        _stellarSdk2.default.Network.usePublicNetwork();
-        server = new _stellarSdk2.default.Server(liveNetUrl);
-      }
+      var resource = _Horizon2.default.load(this.live);
+      var results = await resource.getBalance(address);
 
-      // set the request
-      return new Promise(function (resolve, reject) {
-        server.loadAccount(publicKey).then(function (account) {
-          // return whatever we have
-          resolve(account.balances);
-        }).catch(function (error) {
-          // return error
-          reject(error);
-        });
-      });
+      return results;
+    }
+
+    /**
+     * Fetches the transactions of the given address.
+     * 
+     * @param {String} address 
+     * 
+     * @return {Array}
+     */
+
+  }, {
+    key: 'getHistory',
+    value: async function getHistory(address) {
+      this.logger.log('[XLM]', 'Fetching transactions...');
+
+      var resource = _Horizon2.default.load(this.live);
+      var results = await resource.getTransactions(address);
+
+      return results;
     }
 
     /**
@@ -128,7 +129,18 @@ var Stellar = function (_BlockchainInterface) {
   }, {
     key: 'loadFromPrivateKey',
     value: async function loadFromPrivateKey(privateKey) {
-      throw _Exception2.default.for('TODO loadFromPrivateKey()');
+      // validate if the given private key is valid
+      if (!_stellarBase2.default.StrKey.isValidEd25519SecretSeed(privateKey)) {
+        throw _Exception2.default.for('Invalid private key.');
+      }
+
+      // get the source keys
+      var keys = _stellarSdk2.default.Keypair.fromSecret(privateKey);
+
+      return {
+        address: keys.publicKey(),
+        key: keys.secret()
+      };
     }
 
     /**
@@ -144,7 +156,72 @@ var Stellar = function (_BlockchainInterface) {
     value: async function signTransaction() {
       var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      throw _Exception2.default.for('TODO signTransaction()');
+      // load up the resource
+      var resource = _Horizon2.default.load(this.live);
+
+      // validate source keys
+      if (!_stellarBase2.default.StrKey.isValidEd25519SecretSeed(data.key)) {
+        throw _Exception2.default.for('Invalid private key.');
+      }
+
+      // validate the destination address by getting it's balance
+      var destinationWallet = await resource.getBalance(data.to);
+      if (!destinationWallet) {
+        throw _Exception2.default.for('Invalid destination wallet address');
+      }
+
+      // set the source credentials
+      var sourceKeys = _stellarSdk2.default.Keypair.fromSecret(data.key);
+
+      // check the balance of the source wallet
+      var sourceAccount = await resource.getAccount(sourceKeys.publicKey());
+
+      // store the balance
+      var balance = 0;
+
+      // does it have balances?
+      if (!sourceAccount.balances || sourceAccount.balances.length < 1) {
+        throw _Exception2.default.for('Invalid source account.');
+      }
+
+      // get the native asset type and get its balance
+      for (var b in sourceAccount.balances) {
+        // check if this is the asset type that we are looking for.
+        if (!sourceAccount.balances[b].asset_type || !sourceAccount.balances[b].balance || sourceAccount.balances[b].asset_type !== 'native') {
+          continue;
+        }
+
+        // found it
+        balance = parseFloat(sourceAccount.balances[b].balance);
+      }
+
+      // validate the account balance
+      if (balance < data.value) {
+        throw _Exception2.default.for('Insufficient account balance.');
+      }
+
+      // process submission of transaction
+      // build the transaction
+      var transaction = new _stellarSdk2.default.TransactionBuilder(sourceAccount, {
+        fee: _stellarBase2.default.BASE_FEE
+      }).addOperation(_stellarSdk2.default.Operation.payment({
+        destination: data.to,
+        asset: _stellarSdk2.default.Asset.native(),
+        amount: data.value
+      })).setTimeout(30).build();
+
+      // sign the transaction
+      transaction.sign(sourceKeys);
+
+      // submit
+      var result = await resource.sendTransaction(transaction);
+
+      // no result?
+      if (!result) {
+        throw _Exception2.default.for('Either account is invalid or insufficient account balance.');
+      }
+
+      return result;
     }
   }]);
 

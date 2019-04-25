@@ -1,6 +1,8 @@
 import { parse } from 'url';
 
-export default async (req) => {
+import StellarService from '../../services/Stellar';
+
+export default async (req, res) => {
   const { query } = parse(req.url, true);
   const { pk, live = false } = query;
 
@@ -12,7 +14,16 @@ export default async (req) => {
     return JSON.stringify(payload, null, 4);
   }
 
-  payload.error = true;
-  payload.message = 'TODO';
-  return JSON.stringify(payload, null, 4);
+  const service = new StellarService(live);
+
+  try {
+    payload.results = await service.loadFromPrivateKey(pk);
+  } catch (e) {
+    payload.error = true;
+    payload.message = e.message;
+  }
+
+  // set the header
+  res.setHeader('Content-Type', 'application/json');
+  return JSON.stringify(payload, null, 4)
 };

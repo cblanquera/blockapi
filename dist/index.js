@@ -16,7 +16,7 @@ async function forEach(list, callback) {
   }
 }
 
-exports.default = async function (req) {
+exports.default = async function (req, res) {
   var _parse = (0, _url.parse)(req.url),
       pathname = _parse.pathname;
 
@@ -24,7 +24,7 @@ exports.default = async function (req) {
   await forEach(_now.routes, async function (route) {
     if (route.src === pathname) {
       var promise = require('..' + route.dest);
-      response = await promise(req);
+      response = await promise(req, res);
     }
   });
 

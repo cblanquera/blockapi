@@ -1,5 +1,7 @@
 import { parse } from 'url';
 
+import NEMService from '../../services/NEM';
+
 export default async (req) => {
   const { query } = parse(req.url, true);
   const { pk, live = false } = query;
@@ -12,7 +14,14 @@ export default async (req) => {
     return JSON.stringify(payload, null, 4);
   }
 
-  payload.error = true;
-  payload.message = 'TODO';
+  const service = new NEMService(live);
+
+  try {
+    payload.results = await service.loadFromPrivateKey(pk);
+  } catch (e) {
+    payload.error = true;
+    payload.message = e.message;
+  }
+
   return JSON.stringify(payload, null, 4);
 };
