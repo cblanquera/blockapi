@@ -77,12 +77,36 @@ var Horizon = function () {
             var account = await this.server.loadAccount(publicKey);
             return account.balances;
         }
+
+        /**
+         * Returns the list of completed transactions.
+         * 
+         * @param {String} publicKey 
+         * 
+         * @return {Array}
+         */
+
     }, {
         key: 'getTransactions',
         value: async function getTransactions(publicKey) {
             var results = await this.server.transactions().forAccount(publicKey).call();
 
             return results.records;
+        }
+
+        /**
+         * Submits a signed transaction to the blockchain.
+         * 
+         * @param {String} transaction 
+         * 
+         * @return {Object}
+         */
+
+    }, {
+        key: 'sendTransaction',
+        value: async function sendTransaction(transaction) {
+            var result = await this.server.submitTransaction(transaction);
+            return result;
         }
     }], [{
         key: 'load',

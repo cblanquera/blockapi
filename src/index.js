@@ -10,14 +10,14 @@ async function forEach(list, callback) {
   }
 }
 
-export default async (req) => {
+export default async (req, res) => {
   const { pathname } = parse(req.url);
 
   let response = '{"error": "true", "message": "No route found."}';
   await forEach(routes, async (route) => {
     if (route.src === pathname) {
         let promise = require('..' + route.dest);
-        response = await promise(req);
+        response = await promise(req, res);
     }
   });
 

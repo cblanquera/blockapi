@@ -12,7 +12,7 @@ var _Stellar2 = _interopRequireDefault(_Stellar);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = async function (req) {
+exports.default = async function (req, res) {
   var _parse = (0, _url.parse)(req.url, true),
       query = _parse.query;
 
@@ -38,6 +38,8 @@ exports.default = async function (req) {
     payload.message = e.message;
   }
 
+  // set the header
+  // res.setHeader('Content-Type', 'application/json');
   return JSON.stringify(payload, null, 4);
 };
 

@@ -34,7 +34,7 @@
     { "src": "/litecoin/wallet/history", "dest": "/dist/routes/litecoin/wallet-history.js" },
     { "src": "/litecoin/wallet/send", "dest": "/dist/routes/litecoin/wallet-send.js" },
 
-    { "src": "/stellar/wallet/address", "dest": "/dist/routes/stellar/wallet-address.js" },
+    { "src": "/stellar/wallet/address", "dest": "/dist/routes/stellar/wallet-address.js" , "headers": {"Content-Type": "application/json"}},
     { "src": "/stellar/wallet/balance", "dest": "/dist/routes/stellar/wallet-balance.js" },
     { "src": "/stellar/wallet/create", "dest": "/dist/routes/stellar/wallet-create.js" },
     { "src": "/stellar/wallet/history", "dest": "/dist/routes/stellar/wallet-history.js" },

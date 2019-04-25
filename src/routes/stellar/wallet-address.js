@@ -2,7 +2,7 @@ import { parse } from 'url';
 
 import StellarService from '../../services/Stellar';
 
-export default async (req) => {
+export default async (req, res) => {
   const { query } = parse(req.url, true);
   const { pk, live = false } = query;
 
@@ -23,5 +23,7 @@ export default async (req) => {
     payload.message = e.message;
   }
 
+  // set the header
+  // res.setHeader('Content-Type', 'application/json');
   return JSON.stringify(payload, null, 4)
 };

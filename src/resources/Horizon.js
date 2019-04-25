@@ -52,11 +52,30 @@ export default class Horizon {
         return account.balances;
     }
 
+    /**
+     * Returns the list of completed transactions.
+     * 
+     * @param {String} publicKey 
+     * 
+     * @return {Array}
+     */
     async getTransactions(publicKey) {
         const results = await this.server.transactions()
             .forAccount(publicKey)
             .call();
 
         return results.records;
+    }
+
+    /**
+     * Submits a signed transaction to the blockchain.
+     * 
+     * @param {String} transaction 
+     * 
+     * @return {Object}
+     */
+    async sendTransaction(transaction) {
+        const result = await this.server.submitTransaction(transaction)
+        return result;
     }
 }
