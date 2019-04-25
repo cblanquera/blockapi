@@ -1,6 +1,6 @@
 import { parse } from 'url';
 
-import StellarService from '../../services/Stellar'
+import StellarService from '../../services/Stellar';
 
 export default async (req) => {
   const { query } = parse(req.url, true);

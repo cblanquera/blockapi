@@ -1,8 +1,5 @@
 import StellarSdk from 'stellar-sdk';
 
-import UtxoInterface from '../contracts/UtxoInterface';
-import Exception from '../Exception';
-
 const URLS = {
     "test": "https://horizon-testnet.stellar.org",
     "live": "https://horizon.stellar.org"

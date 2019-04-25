@@ -101,7 +101,6 @@ export default class Stellar extends BlockchainInterface {
     // load up the resource
     const resource = Horizon.load(this.live);
 
-    console.log('data', data);
     // validate source keys
     if (!StellarBase.StrKey.isValidEd25519SecretSeed(data.key)) {
       throw Exception.for('Invalid private key.');
@@ -161,10 +160,9 @@ export default class Stellar extends BlockchainInterface {
 
     // sign the transaction
     transaction.sign(sourceKeys);
-    console.log('fancy');
+    
     // submit
     const result = await resource.sendTransaction(transaction);
-    console.log('you')
 
     // no result?
     if (!result) {

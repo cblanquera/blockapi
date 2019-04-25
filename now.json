@@ -20,7 +20,12 @@
     { "src": "dist/routes/stellar/wallet-balance.js", "use": "now-micro" },
     { "src": "dist/routes/stellar/wallet-create.js", "use": "now-micro" },
     { "src": "dist/routes/stellar/wallet-history.js", "use": "now-micro" },
-    { "src": "dist/routes/stellar/wallet-send.js", "use": "now-micro" }
+    { "src": "dist/routes/stellar/wallet-send.js", "use": "now-micro" },
+    { "src": "dist/routes/nem/wallet-address.js", "use": "now-micro" },
+    { "src": "dist/routes/nem/wallet-balance.js", "use": "now-micro" },
+    { "src": "dist/routes/nem/wallet-create.js", "use": "now-micro" },
+    { "src": "dist/routes/nem/wallet-history.js", "use": "now-micro" },
+    { "src": "dist/routes/nem/wallet-send.js", "use": "now-micro" }
   ],
   "routes": [
     { "src": "/bitcoin/wallet/address", "dest": "/dist/routes/bitcoin/wallet-address.js" },
@@ -38,11 +43,15 @@
     { "src": "/litecoin/wallet/create", "dest": "/dist/routes/litecoin/wallet-create.js" },
     { "src": "/litecoin/wallet/history", "dest": "/dist/routes/litecoin/wallet-history.js" },
     { "src": "/litecoin/wallet/send", "dest": "/dist/routes/litecoin/wallet-send.js" },
-
     { "src": "/stellar/wallet/address", "dest": "/dist/routes/stellar/wallet-address.js"},
     { "src": "/stellar/wallet/balance", "dest": "/dist/routes/stellar/wallet-balance.js" },
     { "src": "/stellar/wallet/create", "dest": "/dist/routes/stellar/wallet-create.js" },
     { "src": "/stellar/wallet/history", "dest": "/dist/routes/stellar/wallet-history.js" },
-    { "src": "/stellar/wallet/send", "dest": "/dist/routes/stellar/wallet-send.js" }
+    { "src": "/stellar/wallet/send", "dest": "/dist/routes/stellar/wallet-send.js" },
+    { "src": "/nem/wallet/address", "dest": "/dist/routes/nem/wallet-address.js"},
+    { "src": "/nem/wallet/balance", "dest": "/dist/routes/nem/wallet-balance.js" },
+    { "src": "/nem/wallet/create", "dest": "/dist/routes/nem/wallet-create.js" },
+    { "src": "/nem/wallet/history", "dest": "/dist/routes/nem/wallet-history.js" },
+    { "src": "/nem/wallet/send", "dest": "/dist/routes/nem/wallet-send.js" }
   ]
 }

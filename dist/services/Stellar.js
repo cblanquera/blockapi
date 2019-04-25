@@ -159,7 +159,6 @@ var Stellar = function (_BlockchainInterface) {
       // load up the resource
       var resource = _Horizon2.default.load(this.live);
 
-      console.log('data', data);
       // validate source keys
       if (!_stellarBase2.default.StrKey.isValidEd25519SecretSeed(data.key)) {
         throw _Exception2.default.for('Invalid private key.');
@@ -213,10 +212,9 @@ var Stellar = function (_BlockchainInterface) {
 
       // sign the transaction
       transaction.sign(sourceKeys);
-      console.log('fancy');
+
       // submit
       var result = await resource.sendTransaction(transaction);
-      console.log('you');
 
       // no result?
       if (!result) {

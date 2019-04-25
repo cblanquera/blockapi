@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -6,17 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _stellarSdk = require('stellar-sdk');
+var _stellarSdk = require("stellar-sdk");
 
 var _stellarSdk2 = _interopRequireDefault(_stellarSdk);
-
-var _UtxoInterface = require('../contracts/UtxoInterface');
-
-var _UtxoInterface2 = _interopRequireDefault(_UtxoInterface);
-
-var _Exception = require('../Exception');
-
-var _Exception2 = _interopRequireDefault(_Exception);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63,7 +55,7 @@ var Horizon = function () {
 
 
     _createClass(Horizon, [{
-        key: 'getAccount',
+        key: "getAccount",
 
 
         /**
@@ -87,7 +79,7 @@ var Horizon = function () {
          */
 
     }, {
-        key: 'getBalance',
+        key: "getBalance",
         value: async function getBalance(publicKey) {
             var account = await this.getAccount(publicKey);
             return account.balances;
@@ -102,7 +94,7 @@ var Horizon = function () {
          */
 
     }, {
-        key: 'getTransactions',
+        key: "getTransactions",
         value: async function getTransactions(publicKey) {
             var results = await this.server.transactions().forAccount(publicKey).call();
 
@@ -118,13 +110,13 @@ var Horizon = function () {
          */
 
     }, {
-        key: 'sendTransaction',
+        key: "sendTransaction",
         value: async function sendTransaction(transaction) {
             var result = await this.server.submitTransaction(transaction);
             return result;
         }
     }], [{
-        key: 'load',
+        key: "load",
         value: function load() {
             var live = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 

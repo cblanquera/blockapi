@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "bignumber.js": "^8.0.1",
+    "bignumber.js": "^8.1.1",
     "bitcoinjs-lib": "^4.0.3",
     "concurrently": "^4.1.0",
     "cryptaddress-validator": "^1.0.2",
@@ -19,6 +19,7 @@
     "ethers": "^4.0.20",
     "isaac": "^0.0.5",
     "micro": "^9.3.3",
+    "nem-sdk": "^1.6.7",
     "now-micro": "^0.3.0",
     "stellar-base": "^0.13.1",
     "stellar-sdk": "^0.15.3",
