@@ -39,7 +39,7 @@ exports.default = async function (req, res) {
   }
 
   // set the header
-  // res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Type', 'application/json');
   return JSON.stringify(payload, null, 4);
 };
 

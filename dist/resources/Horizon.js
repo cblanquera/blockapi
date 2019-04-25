@@ -63,8 +63,20 @@ var Horizon = function () {
 
 
     _createClass(Horizon, [{
-        key: 'getBalance',
+        key: 'getAccount',
 
+
+        /**
+         * Fetches the account details based on the given public key.
+         * 
+         * @param {String} publicKey 
+         * 
+         * @return {Object}
+         */
+        value: async function getAccount(publicKey) {
+            var account = await this.server.loadAccount(publicKey);
+            return account;
+        }
 
         /**
          * Returns the account details of a given public key.
@@ -73,8 +85,11 @@ var Horizon = function () {
          * 
          * @return {Object}
          */
+
+    }, {
+        key: 'getBalance',
         value: async function getBalance(publicKey) {
-            var account = await this.server.loadAccount(publicKey);
+            var account = await this.getAccount(publicKey);
             return account.balances;
         }
 

@@ -101,6 +101,7 @@ export default class Stellar extends BlockchainInterface {
     // load up the resource
     const resource = Horizon.load(this.live);
 
+    console.log('data', data);
     // validate source keys
     if (!StellarBase.StrKey.isValidEd25519SecretSeed(data.key)) {
       throw Exception.for('Invalid private key.');
@@ -108,7 +109,6 @@ export default class Stellar extends BlockchainInterface {
 
     // validate the destination address by getting it's balance
     const destinationWallet = await resource.getBalance(data.to);
-
     if (!destinationWallet) {
       throw Exception.for('Invalid destination wallet address');
     }
@@ -117,8 +117,8 @@ export default class Stellar extends BlockchainInterface {
     const sourceKeys = StellarSdk.Keypair.fromSecret(data.key);
 
     // check the balance of the source wallet
-    const sourceAccount = await resource.getBalance(sourceKeys.publicKey());
-
+    const sourceAccount = await resource.getAccount(sourceKeys.publicKey());
+    
     // store the balance
     let balance = 0;
 
@@ -148,19 +148,23 @@ export default class Stellar extends BlockchainInterface {
 
     // process submission of transaction
     // build the transaction
-    let transaction = new StellarSdk.TransactionBuilder(sourceAccount)
+    let transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
+        fee: StellarBase.BASE_FEE
+      })
       .addOperation(StellarSdk.Operation.payment({
         destination: data.to,
         asset: StellarSdk.Asset.native(),
         amount: data.value
       }))
+      .setTimeout(30)
       .build();
 
     // sign the transaction
     transaction.sign(sourceKeys);
-
+    console.log('fancy');
     // submit
     const result = await resource.sendTransaction(transaction);
+    console.log('you')
 
     // no result?
     if (!result) {

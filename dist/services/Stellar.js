@@ -159,6 +159,7 @@ var Stellar = function (_BlockchainInterface) {
       // load up the resource
       var resource = _Horizon2.default.load(this.live);
 
+      console.log('data', data);
       // validate source keys
       if (!_stellarBase2.default.StrKey.isValidEd25519SecretSeed(data.key)) {
         throw _Exception2.default.for('Invalid private key.');
@@ -166,7 +167,6 @@ var Stellar = function (_BlockchainInterface) {
 
       // validate the destination address by getting it's balance
       var destinationWallet = await resource.getBalance(data.to);
-
       if (!destinationWallet) {
         throw _Exception2.default.for('Invalid destination wallet address');
       }
@@ -175,7 +175,7 @@ var Stellar = function (_BlockchainInterface) {
       var sourceKeys = _stellarSdk2.default.Keypair.fromSecret(data.key);
 
       // check the balance of the source wallet
-      var sourceAccount = await resource.getBalance(sourceKeys.publicKey());
+      var sourceAccount = await resource.getAccount(sourceKeys.publicKey());
 
       // store the balance
       var balance = 0;
@@ -203,17 +203,20 @@ var Stellar = function (_BlockchainInterface) {
 
       // process submission of transaction
       // build the transaction
-      var transaction = new _stellarSdk2.default.TransactionBuilder(sourceAccount).addOperation(_stellarSdk2.default.Operation.payment({
+      var transaction = new _stellarSdk2.default.TransactionBuilder(sourceAccount, {
+        fee: _stellarBase2.default.BASE_FEE
+      }).addOperation(_stellarSdk2.default.Operation.payment({
         destination: data.to,
         asset: _stellarSdk2.default.Asset.native(),
         amount: data.value
-      })).build();
+      })).setTimeout(30).build();
 
       // sign the transaction
       transaction.sign(sourceKeys);
-
+      console.log('fancy');
       // submit
       var result = await resource.sendTransaction(transaction);
+      console.log('you');
 
       // no result?
       if (!result) {

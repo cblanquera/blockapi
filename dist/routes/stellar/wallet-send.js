@@ -6,12 +6,18 @@ Object.defineProperty(exports, "__esModule", {
 
 var _url = require('url');
 
+var _Stellar = require('../../services/Stellar');
+
+var _Stellar2 = _interopRequireDefault(_Stellar);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 exports.default = async function (req) {
   var _parse = (0, _url.parse)(req.url, true),
       query = _parse.query;
 
   var pk = query.pk,
-      destination = query.destination,
+      to = query.to,
       amount = query.amount,
       _query$fees = query.fees,
       fees = _query$fees === undefined ? 0 : _query$fees,
@@ -26,8 +32,8 @@ exports.default = async function (req) {
     errors.pk = 'No secret given';
   }
 
-  if (!destination) {
-    errors.destination = 'No destination address given';
+  if (!to) {
+    errors.to = 'No destination address given';
   }
 
   if (!amount) {
@@ -51,8 +57,19 @@ exports.default = async function (req) {
     return JSON.stringify(payload, null, 4);
   }
 
-  payload.error = true;
-  payload.message = 'TODO';
+  var service = new _Stellar2.default(live);
+
+  try {
+    payload.results = await service.signTransaction({
+      key: pk,
+      to: to,
+      value: amount
+    });
+  } catch (e) {
+    payload.error = true;
+    payload.message = e.message;
+  }
+
   return JSON.stringify(payload, null, 4);
 };
 

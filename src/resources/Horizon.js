@@ -41,6 +41,18 @@ export default class Horizon {
     }
 
     /**
+     * Fetches the account details based on the given public key.
+     * 
+     * @param {String} publicKey 
+     * 
+     * @return {Object}
+     */
+    async getAccount(publicKey) {
+        const account = await this.server.loadAccount(publicKey);
+        return account;
+    }
+
+    /**
      * Returns the account details of a given public key.
      * 
      * @param {String} publicKey 
@@ -48,7 +60,7 @@ export default class Horizon {
      * @return {Object}
      */
     async getBalance(publicKey) {
-        const account = await this.server.loadAccount(publicKey);
+        const account = await this.getAccount(publicKey);
         return account.balances;
     }
 

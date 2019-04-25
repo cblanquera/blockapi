@@ -1,8 +1,10 @@
 import { parse } from 'url';
 
+import StellarService from '../../services/Stellar'
+
 export default async (req) => {
   const { query } = parse(req.url, true);
-  const { pk, destination, amount, fees = 0, live = false } = query;
+  const { pk, to, amount, fees = 0, live = false } = query;
 
   const payload = { error: false };
   const errors = {};
@@ -11,8 +13,8 @@ export default async (req) => {
     errors.pk = 'No secret given';
   }
 
-  if (!destination) {
-    errors.destination = 'No destination address given';
+  if (!to) {
+    errors.to = 'No destination address given';
   }
 
   if (!amount) {
@@ -36,7 +38,18 @@ export default async (req) => {
     return JSON.stringify(payload, null, 4);
   }
 
-  payload.error = true;
-  payload.message = 'TODO';
-  return JSON.stringify(payload, null, 4);
+  const service = new StellarService(live);
+
+  try {
+    payload.results = await service.signTransaction({
+      key: pk,
+      to: to,
+      value: amount
+    });
+  } catch (e) {
+    payload.error = true;
+    payload.message = e.message;
+  }
+
+  return JSON.stringify(payload, null, 4)
 };
